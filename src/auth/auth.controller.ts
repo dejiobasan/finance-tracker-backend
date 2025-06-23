@@ -7,6 +7,11 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UsersService } from 'src/users/users.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtPayload } from 'src/common/decorators/current-user.decorator';
+import cloudinary from 'src/config/cloudinary';
+
+interface CloudinaryResponse {
+  secure_url: string;
+}
 
 @Controller('auth')
 export class AuthController {
@@ -17,6 +22,17 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() dto: RegisterDto, @Res() res: Response) {
+    let cloudinaryResponse: CloudinaryResponse;
+    if (dto.image) {
+      try {
+        cloudinaryResponse = await cloudinary.uploader.upload(dto.image, {
+          folder: 'Users',
+        });
+        dto.image = cloudinaryResponse?.secure_url;
+      } catch (error) {
+        console.error(error);
+      }
+    }
     const token = await this.authService.register(dto);
     res.cookie('jwt', token.access_token, {
       httpOnly: true,

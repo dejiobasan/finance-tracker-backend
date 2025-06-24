@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import {
@@ -14,12 +15,15 @@ import {
 } from '../common/decorators/current-user.decorator';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { AdminGuard } from 'src/auth/guards/admin.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-  @Post()
+  @Post('addTransaction')
+  @UseGuards(JwtAuthGuard)
   async create(
     @CurrentUser() user: JwtPayload,
     @Body() dto: CreateTransactionDto,
@@ -31,7 +35,8 @@ export class TransactionsController {
     };
   }
 
-  @Get()
+  @Get('allUserTransactions')
+  @UseGuards(JwtAuthGuard)
   async getAll(@CurrentUser() user: JwtPayload) {
     const transactions = await this.transactionsService.findAllByUser(
       user.userId,
@@ -42,7 +47,18 @@ export class TransactionsController {
     };
   }
 
-  @Patch(':id')
+  @Get('allTransactions')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  async getAllTransactions() {
+    const transactions = await this.transactionsService.findAllTransactions();
+    return {
+      message: 'All transactions retrieved',
+      data: transactions,
+    };
+  }
+
+  @Patch('updateTransaction/:id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
@@ -55,7 +71,8 @@ export class TransactionsController {
     };
   }
 
-  @Delete(':id')
+  @Delete('deleteTransaction/:id')
+  @UseGuards(JwtAuthGuard)
   async delete(@CurrentUser() user: JwtPayload, @Param('id') id: string) {
     return this.transactionsService.delete(user.userId, id);
   }

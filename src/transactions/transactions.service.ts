@@ -28,6 +28,10 @@ export class TransactionsService {
     return this.transactionModel.find({ userId }).sort({ date: -1 });
   }
 
+  async findAllTransactions(): Promise<Transaction[]> {
+    return this.transactionModel.find().sort({ date: -1 });
+  }
+
   async update(
     userId: string,
     id: string,

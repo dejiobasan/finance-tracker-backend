@@ -33,24 +33,29 @@ export class AuthController {
         console.error(error);
       }
     }
-    const token = await this.authService.register(dto);
-    res.cookie('jwt', token.access_token, {
+    const { access_token, user } = await this.authService.register(dto);
+    res.cookie('jwt', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
-    return res.send({ message: 'Registration successful' });
+    return res.send({
+      user,
+      success: true,
+      message: 'Registration successful',
+    });
   }
 
   @Post('login')
   async login(@Body() dto: LoginDto, @Res() res: Response) {
-    const token = await this.authService.login(dto);
-    res.cookie('jwt', token.access_token, {
+    const { access_token, user } = await this.authService.login(dto);
+
+    res.cookie('jwt', access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
-    return res.send({ message: 'Login successful' });
+    return res.send({ succes: true, message: 'Login successful', user });
   }
 
   @Get('me')

@@ -32,7 +32,9 @@ export class AuthService {
       ...dto,
       password: hashedPassword,
     });
-    return this.generateToken(user._id, user.email);
+    const access_token = this.generateToken(user._id, user.email);
+
+    return { access_token, user };
   }
 
   async login(dto: LoginDto) {
@@ -41,7 +43,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateToken(user._id, user.email);
+    const access_token = this.generateToken(user._id, user.email);
+
+    return { access_token, user };
   }
 
   private generateToken(userId: string, email: string) {

@@ -32,9 +32,8 @@ export class AuthService {
       ...dto,
       password: hashedPassword,
     });
-    const access_token = this.generateToken(user._id, user.email);
 
-    return { access_token, user };
+    return user;
   }
 
   async login(dto: LoginDto) {
@@ -42,7 +41,6 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
     const access_token = this.generateToken(user._id, user.email);
 
     return { access_token, user };

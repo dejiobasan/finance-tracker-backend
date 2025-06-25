@@ -33,12 +33,7 @@ export class AuthController {
         console.error(error);
       }
     }
-    const { access_token, user } = await this.authService.register(dto);
-    res.cookie('jwt', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-    });
+    const user = await this.authService.register(dto);
     return res.send({
       user,
       success: true,
@@ -55,7 +50,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
-    return res.send({ succes: true, message: 'Login successful', user });
+    return res.send({ success: true, message: 'Login successful', user });
   }
 
   @Get('me')

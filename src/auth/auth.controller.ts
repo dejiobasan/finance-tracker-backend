@@ -35,9 +35,16 @@ export class AuthController {
     }
     const user = await this.authService.register(dto);
     return res.send({
-      user,
       success: true,
       message: 'Registration successful',
+      user: {
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        image: user.image,
+        number: user.number,
+      },
     });
   }
 
@@ -50,7 +57,18 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
     });
-    return res.send({ success: true, message: 'Login successful', user });
+    return res.send({
+      success: true,
+      message: 'Login successful',
+      user: {
+        _id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        image: user.image,
+        number: user.number,
+      },
+    });
   }
 
   @Get('me')

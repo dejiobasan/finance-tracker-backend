@@ -1,4 +1,12 @@
-import { Body, Get, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Get,
+  Controller,
+  Post,
+  Res,
+  UseGuards,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -29,8 +37,8 @@ export class AuthController {
           folder: 'Users',
         });
         dto.image = cloudinaryResponse?.secure_url;
-      } catch (error) {
-        console.error(error);
+      } catch {
+        throw new InternalServerErrorException('Error uploading image');
       }
     }
     const user = await this.authService.register(dto);
